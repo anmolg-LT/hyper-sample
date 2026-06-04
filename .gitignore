@@ -1,0 +1,22 @@
+# Maven build output
+target/
+
+# HyperExecute CLI runtime files
+hyperexecute-cli.log
+hyperexecute.log
+hyperexecuteupdate
+.hyperexecute/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Logs
+*.log
