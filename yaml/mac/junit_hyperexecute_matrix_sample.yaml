@@ -1,0 +1,21 @@
+---
+version: 0.1
+runson: mac
+
+runtime:
+  language: java
+  version: 17
+
+matrix:
+  classname: ["ToDoAddAndCompleteTest", "ToDoFilterTest", "ToDoClearAndDeleteTest", "ToDoAddAndComplete2Test", "InputFormSubmitTest", "BingSearchTest", "ToDoAddAndComplete3Test", "InputFormSubmit2Test", "BingSearch2Test", "ToDoAddAndComplete4Test", "InputFormSubmit3Test", "BingSearch3Test", "ToDoAddAndComplete5Test", "InputFormSubmit4Test", "BingSearch4Test"]
+
+pre:
+  - mvn -Dmaven.repo.local=${CACHE_DIR} -Dmaven.test.skip=true clean install
+
+testSuites:
+  - mvn -Dplatname=mac -Dmaven.repo.local=m2_cache_dir -Dtest=$classname test site surefire-report:report
+
+retryOnFailure: true
+maxRetries: 1
+
+jobLabel: [selenium-junit, mac, matrix]

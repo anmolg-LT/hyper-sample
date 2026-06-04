@@ -1,0 +1,23 @@
+---
+version: 0.1
+runson: win
+
+runtime:
+  language: java
+  version: 17
+
+concurrency: 3
+
+matrix:
+  classname: ["ToDoAddAndCompleteTest", "ToDoFilterTest", "ToDoClearAndDeleteTest", "ToDoAddAndComplete2Test", "InputFormSubmitTest", "BingSearchTest", "ToDoAddAndComplete3Test", "InputFormSubmit2Test", "BingSearch2Test", "ToDoAddAndComplete4Test", "InputFormSubmit3Test", "BingSearch3Test", "ToDoAddAndComplete5Test", "InputFormSubmit4Test", "BingSearch4Test"]
+
+pre:
+  - mvn clean install
+
+testSuites:
+  - mvn `-Dplatname=win `-Dmaven.repo.local=m2_cache_dir `-Dtest=$classname test site surefire-report:report
+
+retryOnFailure: true
+maxRetries: 1
+
+jobLabel: [selenium-junit, win, matrix]

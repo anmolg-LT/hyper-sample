@@ -1,0 +1,33 @@
+---
+version: 0.1
+runson: linux
+
+runtime:
+  language: java
+  version: 17
+
+autosplit: true
+concurrency: 3
+
+pre:
+  - mvn -Dmaven.repo.local=m2_cache_dir -Dmaven.test.skip=true clean install
+
+mergeArtifacts: true
+
+testDiscovery:
+  type: raw
+  mode: dynamic
+  command: grep 'public class' src/test/java/hyperexecute/*.java | awk '{print$3}'
+
+testRunnerCommand: mvn -Dplatname=linux -Dmaven.repo.local=m2_cache_dir -Dtest=$test test site surefire-report:report
+
+retryOnFailure: true
+maxRetries: 1
+
+jobLabel: [selenium-junit, linux, autosplit]
+
+report: true
+partialReports:
+ location: target/surefire-reports/html
+ type: html
+ frameworkName: extent

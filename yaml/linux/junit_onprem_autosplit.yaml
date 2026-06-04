@@ -1,0 +1,34 @@
+---
+version: 0.1
+runson: linux
+
+runtime:
+  language: java
+  version: 17
+
+autosplit: true
+concurrency: 3
+
+pre:
+  - mvn clean install
+
+mergeArtifacts: true
+
+testDiscovery:
+  type: raw
+  mode: dynamic
+  command: grep 'public class' src/test/java/hyperexecute/*.java | awk '{print$3}'
+
+testRunnerCommand: mvn -Dplatname=linux -Dmaven.repo.local=m2_cache_dir -Dtest=$test test site surefire-report:report
+
+retryOnFailure: true
+maxRetries: 1
+
+jobLabel: [selenium-junit, linux, autosplit]
+
+
+project:
+  name: GarvitLT/yaml-inheritance
+  id: 01KJQ6E6YCA53T46NMHJAN9TKE
+  
+report: true
