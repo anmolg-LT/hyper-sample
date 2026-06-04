@@ -2,6 +2,7 @@
 target/
 
 # HyperExecute CLI runtime files
+hyperexecute
 hyperexecute-cli.log
 hyperexecute.log
 hyperexecuteupdate
