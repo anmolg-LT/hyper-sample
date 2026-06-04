@@ -1,0 +1,32 @@
+name: HyperExecute
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        required: true
+        description: LT Username
+      accessKey:
+        description: LT Access Key
+        required: true
+        
+jobs:
+  HyperExecute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Download CLI and Setting Environment Variables
+        shell: bash
+        run: |
+          curl https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute -o hyperexecute
+          chmod +x hyperexecute
+      
+      - name: Executing the Job
+        shell: bash
+        run: |
+          ./hyperexecute --user ${{ github.event.inputs.username }} --key ${{ github.event.inputs.accessKey }} --download-artifacts --config yaml/linux/junit_hyperexecute_autosplit_sample.yaml
+          echo "Test completion"
