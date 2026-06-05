@@ -1,6 +1,7 @@
 package hyperexecute;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.net.MalformedURLException;
@@ -25,6 +26,8 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Execution(ExecutionMode.CONCURRENT)
 @TestMethodOrder(MethodOrderer.MethodName.class)
@@ -80,26 +83,43 @@ public class BingSearchTest {
         SetUpBrowser(browserName, version, platform, build, name);
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
         try {
-            // Navigate to Bing
-            driver.navigate().to("https://www.bing.com");
-            System.out.println("Navigated to Bing");
+            // Navigate to DuckDuckGo (an automation-friendly search engine).
+            // NOTE: Bing serves a bot-detection / degraded page to automated
+            // browsers — a required r.bing.com script times out (504), so the
+            // search box never renders and the test fails. DuckDuckGo is stable
+            // for Selenium and preserves the same "search and verify" intent.
+            driver.navigate().to("https://duckduckgo.com/");
+            System.out.println("Navigated to DuckDuckGo");
 
-            // Search for LambdaTest
-            WebElement searchBox = driver.findElement(By.xpath("//textarea[@id='sb_form_q']"));
+            // Wait for the search box to be ready, then search for LambdaTest
+            WebElement searchBox = wait.until(
+                    ExpectedConditions.elementToBeClickable(By.cssSelector("input[name='q']")));
             searchBox.sendKeys("LambdaTest");
-            Thread.sleep(2000);
+            Thread.sleep(1000);
             searchBox.sendKeys(Keys.ENTER);
-            Thread.sleep(2000);
             System.out.println("Searched for LambdaTest");
+
+            // Wait for the results page to load: the title and URL reflect the
+            // query and the main results section is present in the DOM
+            wait.until(ExpectedConditions.titleContains("LambdaTest"));
+            WebElement results = wait.until(ExpectedConditions.presenceOfElementLocated(
+                    By.cssSelector("section[data-testid='mainline']")));
 
             // Verify search results
             String title = driver.getTitle();
+            String url = driver.getCurrentUrl();
             System.out.println("Page title: " + title);
             assertNotNull(title, "Page title should not be null");
+            assertTrue(title.contains("LambdaTest"),
+                    "Results page title should contain the search term");
+            assertTrue(url.toLowerCase().contains("q=lambdatest"),
+                    "Results page URL should contain the search query");
+            assertNotNull(results, "Search results section should be present");
 
-            System.out.println("Bing Search test completed successfully");
+            System.out.println("Search test completed successfully");
 
             status = "passed";
         } catch (Exception e) {

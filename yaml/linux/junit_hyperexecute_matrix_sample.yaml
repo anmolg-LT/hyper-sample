@@ -7,7 +7,7 @@ runtime:
   version: 17
 
 matrix:
-  classname: ["ToDoAddAndCompleteTest", "ToDoFilterTest", "ToDoClearAndDeleteTest", "ToDoAddAndComplete2Test", "InputFormSubmitTest", "BingSearchTest", "ToDoAddAndComplete3Test", "InputFormSubmit2Test", "BingSearch2Test", "ToDoAddAndComplete4Test", "InputFormSubmit3Test", "BingSearch3Test", "ToDoAddAndComplete5Test", "InputFormSubmit4Test", "BingSearch4Test"]
+  classname: ["ToDoAddAndCompleteTest", "ToDoFilterTest", "ToDoClearAndDeleteTest", "ToDoAddAndComplete2Test", "InputFormSubmitTest", "BingSearchTest", "ToDoAddAndComplete3Test", "InputFormSubmit2Test", "BingSearch2Test", "ToDoAddAndComplete4Test", "InputFormSubmit3Test", "BingSearch3Test", "ToDoAddAndComplete5Test", "InputFormSubmit4Test", "BingSearch4Test", "FormCreateTest", "FormEditTest", "FormDeleteTest", "FormValidationTest"]
 
 pre:
   - mvn clean install

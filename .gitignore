@@ -24,3 +24,8 @@ hyperexecuteupdate
 
 # Logs
 *.log
+
+# Local scratch / generated artifacts
+cp.txt
+scratch/
+.updatedhyperexecute.yaml

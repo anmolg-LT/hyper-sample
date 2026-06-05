@@ -1,6 +1,5 @@
 package hyperexecute;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -22,7 +21,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -31,12 +29,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Execution(ExecutionMode.CONCURRENT)
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class BingSearch3Test {
+public class FormEditTest {
     protected RemoteWebDriver driver = null;
     public static String status;
     String gridURL = "@hub.lambdatest.com/wd/hub";
     String user_name = System.getenv("LT_USERNAME") == null ? "LT_USERNAME" : System.getenv("LT_USERNAME");
     String access_key = System.getenv("LT_ACCESS_KEY") == null ? "LT_ACCESS_KEY" : System.getenv("LT_ACCESS_KEY");
+    String test_platform = System.getenv("TEST_OS");
 
     @BeforeAll
     public static void start() {
@@ -48,8 +47,7 @@ public class BingSearch3Test {
         System.out.println("Setting up resources to run tests on HyperExecute Grid");
     }
 
-    public void SetUpBrowser(String browserName, String version, String platform,
-            String build, String name) {
+    public void SetUpBrowser(String browserName, String version, String platform, String build, String name) {
         MutableCapabilities capabilities = new MutableCapabilities();
 
         // W3C compliant capabilities
@@ -79,48 +77,57 @@ public class BingSearch3Test {
 
     @ParameterizedTest
     @MethodSource("setup_testEnvironment")
-    public void test_BingSearch4(String browserName, String version, String platform, String build, String name) {
+    public void test_FormEdit(String browserName, String version, String platform, String build, String name) {
         SetUpBrowser(browserName, version, platform, build, name);
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
         try {
-            // Navigate to DuckDuckGo (an automation-friendly search engine).
-            // NOTE: Bing serves a bot-detection / degraded page to automated
-            // browsers — a required r.bing.com script times out (504), so the
-            // search box never renders and the test fails. DuckDuckGo is stable
-            // for Selenium and preserves the same "search and verify" intent.
-            driver.navigate().to("https://duckduckgo.com/");
-            System.out.println("Navigated to DuckDuckGo");
+            driver.get("https://anmolg-lt.github.io/New-Sample-To-Do/");
+            System.out.println("Navigated to ToDo App");
 
-            // Wait for the search box to be ready, then search for LambdaTest
-            WebElement searchBox = wait.until(
-                    ExpectedConditions.elementToBeClickable(By.cssSelector("input[name='q']")));
-            searchBox.sendKeys("LambdaTest");
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+            // Switch to the Forms view
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath(
+                    "//button[contains(@class,'nav-link') and normalize-space(.)='Forms']"))).click();
             Thread.sleep(1000);
-            searchBox.sendKeys(Keys.ENTER);
-            System.out.println("Searched for LambdaTest");
 
-            // Wait for the results page to load: the title and URL reflect the
-            // query and the main results section is present in the DOM
-            wait.until(ExpectedConditions.titleContains("LambdaTest"));
-            WebElement results = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    By.cssSelector("section[data-testid='mainline']")));
+            // Create a form to edit
+            wait.until(ExpectedConditions.elementToBeClickable(
+                    By.cssSelector("button.new-form-btn"))).click();
+            Thread.sleep(1000);
+            driver.findElement(By.cssSelector("input[aria-label='Name']")).sendKeys("Edit Me");
+            driver.findElement(By.cssSelector("input[aria-label='Age']")).sendKeys("20");
+            driver.findElement(By.cssSelector("input[aria-label='City']")).sendKeys("Paris");
+            driver.findElement(By.cssSelector("input[aria-label='Email']")).sendKeys("edit@example.com");
+            driver.findElement(By.xpath("//button[normalize-space(.)='Save form']")).click();
+            Thread.sleep(1000);
+            System.out.println("Created form 'Edit Me'");
 
-            // Verify search results
-            String title = driver.getTitle();
-            String url = driver.getCurrentUrl();
-            System.out.println("Page title: " + title);
-            assertNotNull(title, "Page title should not be null");
-            assertTrue(title.contains("LambdaTest"),
-                    "Results page title should contain the search term");
-            assertTrue(url.toLowerCase().contains("q=lambdatest"),
-                    "Results page URL should contain the search query");
-            assertNotNull(results, "Search results section should be present");
+            // Open the edit view from the detail view
+            wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//button[normalize-space(.)='Edit']"))).click();
+            Thread.sleep(1000);
 
-            System.out.println("Search test completed successfully");
+            // Change the city and save
+            WebElement cityField = driver.findElement(By.cssSelector("input[aria-label='City']"));
+            cityField.clear();
+            cityField.sendKeys("Lyon");
+            Thread.sleep(1000);
+            driver.findElement(By.xpath("//button[normalize-space(.)='Save changes']")).click();
+            Thread.sleep(1000);
+            System.out.println("Saved edited form");
 
+            // Verify the detail view reflects the update
+            wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//h1[normalize-space(.)='Edit Me']")));
+            String detailText = driver.findElement(By.cssSelector(".entry-detail")).getText();
+            assertTrue(detailText.contains("Lyon"), "Detail view should contain the updated city");
+            assertTrue(!detailText.contains("Paris"), "Detail view should no longer contain the old city");
+            System.out.println("Edited form detail view verified");
+
+            System.out.println("Form Edit test completed successfully");
             status = "passed";
         } catch (Exception e) {
             status = "failed";
@@ -150,9 +157,9 @@ public class BingSearch3Test {
         return Stream.of(
                 arguments("Chrome", "latest", platform_name,
                         "DailyRegressionBuild",
-                        "Bing Search (3)"),
+                        "Form Edit"),
                 arguments("Microsoft Edge", "latest", platform_name,
                         "DailyRegressionBuild",
-                        "Bing Search (3)"));
+                        "Form Edit"));
     }
 }
