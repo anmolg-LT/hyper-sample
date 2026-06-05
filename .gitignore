@@ -1,6 +1,9 @@
 # Maven build output
 target/
 
+# Maven dependency cache (regenerated on build, cached by HyperExecute)
+m2_cache_dir/
+
 # HyperExecute CLI runtime files
 hyperexecute
 hyperexecute-cli.log

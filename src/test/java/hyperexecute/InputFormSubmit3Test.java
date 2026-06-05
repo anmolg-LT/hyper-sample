@@ -24,7 +24,6 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -83,90 +82,50 @@ public class InputFormSubmit3Test {
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
         try {
-            // Navigate to Selenium Playground
-            driver.get("https://www.lambdatest.com/selenium-playground/");
-            System.out.println("Navigated to Selenium Playground");
+            // Navigate to DemoQA Practice Form
+            driver.get("https://demoqa.com/automation-practice-form");
+            System.out.println("Navigated to DemoQA Practice Form");
 
-            // Wait for page to fully load and React to initialize
-            Thread.sleep(3000);
-
-            // Click on Input Form Submit link with retry logic
-            WebDriverWait linkWait = new WebDriverWait(driver, Duration.ofSeconds(15));
-            int maxRetries = 3;
-            boolean clicked = false;
-
-            for (int i = 0; i < maxRetries && !clicked; i++) {
-                try {
-                    WebElement element = linkWait.until(ExpectedConditions.elementToBeClickable(
-                            By.xpath("//a[.='Input Form Submit']")));
-                    element.click();
-                    clicked = true;
-                    System.out.println("Clicked on Input Form Submit link");
-                } catch (org.openqa.selenium.StaleElementReferenceException e) {
-                    System.out.println("Stale element, retrying... Attempt " + (i + 1));
-                    Thread.sleep(1000);
-                }
-            }
-
-            if (!clicked) {
-                throw new Exception("Failed to click Input Form Submit after " + maxRetries + " retries");
-            }
-
-            Thread.sleep(2000);
+            // Wait for the form to render
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+            WebElement firstName = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(By.id("firstName")));
 
             // Fill in the form
-            WebElement name_field = driver.findElement(By.xpath("//input[@id='name']"));
-            name_field.sendKeys("Testing");
+            firstName.sendKeys("Testing");
+            driver.findElement(By.id("lastName")).sendKeys("User");
+            driver.findElement(By.id("userEmail")).sendKeys("testing@testing.com");
 
-            WebElement email_address = driver.findElement(By.id("inputEmail4"));
-            email_address.sendKeys("testing@testing.com");
+            // Gender — the radio input is hidden, so click its label via JS
+            WebElement genderLabel = driver.findElement(By.cssSelector("label[for='gender-radio-1']"));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", genderLabel);
 
-            WebElement password = driver.findElement(By.xpath("//input[@name='password']"));
-            password.sendKeys("password");
+            driver.findElement(By.id("userNumber")).sendKeys("1234567890");
 
-            WebElement company = driver.findElement(By.cssSelector("#company"));
-            company.sendKeys("LambdaTest");
+            // Hobbies — the checkbox input is hidden, so click its label via JS
+            WebElement hobbyLabel = driver.findElement(By.cssSelector("label[for='hobbies-checkbox-1']"));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", hobbyLabel);
 
-            WebElement website = driver.findElement(By.cssSelector("#websitename"));
-            website.sendKeys("https://www.lambdatest.com");
-
-            WebElement countryDropDown = driver.findElement(By.xpath("//select[@name='country']"));
-            Select selectElement = new Select(countryDropDown);
-            selectElement.selectByIndex(6);
-
-            WebElement city = driver.findElement(By.xpath("//input[@id='inputCity']"));
-            city.sendKeys("San Jose");
-
-            WebElement address1 = driver.findElement(By.cssSelector("[placeholder='Address 1']"));
-            address1.sendKeys("Googleplex, 1600 Amphitheatre Pkwy");
-
-            WebElement address2 = driver.findElement(By.cssSelector("[placeholder='Address 2']"));
-            address2.sendKeys(" Mountain View, CA 94043");
-
-            WebElement state = driver.findElement(By.cssSelector("#inputState"));
-            state.sendKeys("California");
-
-            WebElement zipcode = driver.findElement(By.cssSelector("#inputZip"));
-            zipcode.sendKeys("94088");
+            driver.findElement(By.id("currentAddress"))
+                    .sendKeys("Googleplex, 1600 Amphitheatre Pkwy, Mountain View, CA 94043");
 
             System.out.println("Filled in all form fields");
 
-            // Click submit button
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.cssSelector("#seleniumform > div.text-right.mt-20 > button")));
+            // Submit the form — JS click avoids the fixed footer ad intercepting the click
+            WebElement submitBtn = driver.findElement(By.id("submit"));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", submitBtn);
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
-            Thread.sleep(2000);
             System.out.println("Clicked submit button");
 
-            // Verify form submission was successful
-            Boolean formSubmitted = driver.getPageSource().contains(
-                    "Thanks for contacting us, we will get back to you shortly");
+            // Verify the confirmation modal appears
+            WebElement modalTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.id("example-modal-sizes-title-lg")));
+            Boolean formSubmitted = modalTitle.getText().contains("Thanks for submitting the form");
 
             if (formSubmitted) {
-                System.out.println("Input Form Demo successful");
+                System.out.println("Practice Form submission successful");
             } else {
-                System.out.println("Input Form Demo completed");
+                System.out.println("Practice Form submission completed");
             }
 
             status = "passed";
