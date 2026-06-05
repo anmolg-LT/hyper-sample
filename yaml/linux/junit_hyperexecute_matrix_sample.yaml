@@ -19,3 +19,7 @@ retryOnFailure: true
 maxRetries: 1
 
 jobLabel: [selenium-junit, linux, matrix]
+
+project:
+  name: hyper-sample
+  id: 01KTBN27NYDG4TY659E0V81RJ4

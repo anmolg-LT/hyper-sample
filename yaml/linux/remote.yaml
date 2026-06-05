@@ -16,7 +16,7 @@ mergeArtifacts: true
 
 testDiscovery:
   type: raw
-  mode: dynamic
+  mode: remote
   command: grep 'public class' src/test/java/hyperexecute/*.java | awk '{print$3}'
 
 testRunnerCommand: mvn -Dplatname=linux -Dmaven.repo.local=m2_cache_dir -Dtest=$test test site surefire-report:report
@@ -24,10 +24,10 @@ testRunnerCommand: mvn -Dplatname=linux -Dmaven.repo.local=m2_cache_dir -Dtest=$
 retryOnFailure: true
 maxRetries: 1
 
-jobLabel: [selenium-junit, linux, autosplit]
+jobLabel: [selenium-junit, linux, remote-discovery]
 
 project:
   name: hyper-sample
   id: 01KTBN27NYDG4TY659E0V81RJ4
-  
+
 report: true
