@@ -5,7 +5,7 @@ target/
 m2_cache_dir/
 
 # HyperExecute CLI runtime files
-hyperexecute
+/hyperexecute
 hyperexecute-cli.log
 hyperexecute.log
 hyperexecuteupdate
