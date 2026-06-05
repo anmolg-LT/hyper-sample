@@ -10,7 +10,7 @@ autosplit: true
 concurrency: 3
 
 pre:
-  - mvn clean install
+  - mvn -Dmaven.repo.local=m2_cache_dir -Dmaven.test.skip=true clean install
 
 mergeArtifacts: true
 
