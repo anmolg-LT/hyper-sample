@@ -21,8 +21,8 @@ testDiscovery:
 
 testRunnerCommand: mvn -Dplatname=linux -Dmaven.repo.local=m2_cache_dir -Dtest=$test test site surefire-report:report
 
-failFast:
-  maxNumberOfTests: 1
+retryOnFailure: true
+maxRetries: 1
 
 jobLabel: [selenium-junit, linux, autosplit]
 
