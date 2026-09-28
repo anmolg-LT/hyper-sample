@@ -119,9 +119,20 @@ public class BingSearch2Test {
                     "Results page URL should contain the search query");
             assertNotNull(results, "Search results section should be present");
 
+            // Intentionally wrong assertion: forces a real test failure so the
+            // Maven build fails and HyperExecute's retryOnFailure kicks in
+            assertTrue(title.contains("ThisTextWillNeverAppear"),
+                    "Intentional failure to exercise HyperExecute retries");
+
             System.out.println("Search test completed successfully");
 
             status = "passed";
+        } catch (AssertionError e) {
+            // Mark the session failed on LambdaTest, then rethrow so JUnit
+            // (and therefore Maven) reports the failure
+            status = "failed";
+            System.out.println("Assertion failed: " + e.getMessage());
+            throw e;
         } catch (Exception e) {
             status = "failed";
             System.out.println("Test failed: " + e.getMessage());
